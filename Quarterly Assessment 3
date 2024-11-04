@@ -1,0 +1,245 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import sqlite3
+
+# Connect to SQLite database (or create it if it doesn't exist)
+conn = sqlite3.connect('quiz_bowl.db')
+cursor = conn.cursor()
+
+# Create separate tables for each category
+category_tables = {
+    "Math": '''CREATE TABLE IF NOT EXISTS math_questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question_text TEXT,
+        option_a TEXT,
+        option_b TEXT,
+        option_c TEXT,
+        option_d TEXT,
+        correct_answer TEXT
+    )''',
+    "Science": '''CREATE TABLE IF NOT EXISTS science_questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question_text TEXT,
+        option_a TEXT,
+        option_b TEXT,
+        option_c TEXT,
+        option_d TEXT,
+        correct_answer TEXT
+    )''',
+    "History": '''CREATE TABLE IF NOT EXISTS history_questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question_text TEXT,
+        option_a TEXT,
+        option_b TEXT,
+        option_c TEXT,
+        option_d TEXT,
+        correct_answer TEXT
+    )''',
+    "Literature": '''CREATE TABLE IF NOT EXISTS literature_questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question_text TEXT,
+        option_a TEXT,
+        option_b TEXT,
+        option_c TEXT,
+        option_d TEXT,
+        correct_answer TEXT
+    )''',
+    "Geography": '''CREATE TABLE IF NOT EXISTS geography_questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question_text TEXT,
+        option_a TEXT,
+        option_b TEXT,
+        option_c TEXT,
+        option_d TEXT,
+        correct_answer TEXT
+    )''',
+}
+
+# Create tables in the database
+for table_creation_query in category_tables.values():
+    cursor.execute(table_creation_query)
+conn.commit()
+
+# Define sample data for each category
+sample_data = {
+    "Math": [
+        ("What is 2 + 2?", "3", "4", "5", "6", "B"),
+        ("What is 5 + 7?", "10", "11", "12", "13", "C"),
+        ("What is 8 - 3?", "4", "5", "6", "7", "B"),
+        ("What is 9 * 3?", "27", "18", "36", "24", "A"),
+        ("What is 15 / 3?", "3", "4", "5", "6", "C"),
+        ("What is 6 + 9?", "13", "14", "15", "16", "C"),
+        ("What is 12 - 4?", "6", "7", "8", "9", "C"),
+        ("What is 7 * 4?", "28", "24", "30", "32", "A"),
+        ("What is 20 / 5?", "2", "4", "5", "6", "C"),
+        ("What is 18 + 6?", "22", "23", "24", "25", "C")
+        # Add more Math questions as needed
+    ],
+    "Science": [
+        ("What planet is known as the Red Planet?", "Earth", "Mars", "Venus", "Jupiter", "B"),
+        ("What gas do plants absorb from the atmosphere?", "Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen", "B"),
+        ("What is the chemical symbol for water?", "H2O", "O2", "CO2", "H2", "A"),
+        ("What force keeps us on the ground and prevents us from floating into space?", "Magnetism", "Gravity", "Inertia", "Friction", "B"),
+        ("What part of the plant conducts photosynthesis?", "Root", "Stem", "Leaf", "Flower", "C"),
+        ("What planet is closest to the Sun?", "Earth", "Venus", "Mars", "Mercury", "D"),
+        ("What is the largest organ in the human body?", "Brain", "Heart", "Skin", "Liver", "C"),
+        ("What gas do humans exhale?", "Oxygen", "Carbon Dioxide", "Nitrogen", "Helium", "B"),
+        ("What is the boiling point of water in Celsius?", "90", "100", "110", "120", "B"),
+        ("What is the powerhouse of the cell?", "Nucleus", "Mitochondria", "Ribosome", "Chloroplast", "B")
+        # Add more Science questions as needed
+    ],
+    "History": [
+        ("Who was the first President of the United States?", "Thomas Jefferson", "Abraham Lincoln", "George Washington", "Benjamin Franklin", "C"),
+        ("In which year did World War II end?", "1942", "1943", "1945", "1946", "C"),
+        ("Which ancient civilization built the pyramids?", "Romans", "Greeks", "Egyptians", "Persians", "C"),
+        ("Who wrote the Declaration of Independence?", "George Washington", "Thomas Jefferson", "John Adams", "Alexander Hamilton", "B"),
+        ("Who was known as the 'Father of the Constitution'?", "George Washington", "James Madison", "Benjamin Franklin", "Thomas Jefferson", "B"),
+        ("Which empire was led by Julius Caesar?", "Greek Empire", "Persian Empire", "Roman Empire", "Ottoman Empire", "C"),
+        ("What was the name of the ship that brought the Pilgrims to America?", "Santa Maria", "Mayflower", "Victoria", "Endeavour", "B"),
+        ("Who was the famous nurse during the Crimean War?", "Clara Barton", "Florence Nightingale", "Marie Curie", "Susan B. Anthony", "B"),
+        ("In which city was the Titanic built?", "New York", "Liverpool", "Belfast", "Southampton", "C"),
+        ("Which event started World War I?", "Sinking of Lusitania", "Assassination of Archduke Franz Ferdinand", "Treaty of Versailles", "Invasion of Poland", "B")
+        # Add more History questions as needed
+    ],
+    "Literature": [
+        ("Who wrote 'To Kill a Mockingbird'?", "Harper Lee", "F. Scott Fitzgerald", "Ernest Hemingway", "Mark Twain", "A"),
+        ("Who wrote 'Pride and Prejudice'?", "Jane Austen", "Emily Bronte", "George Eliot", "Charles Dickens", "A"),
+        ("Who is the author of '1984'?", "Aldous Huxley", "George Orwell", "Ray Bradbury", "J.D. Salinger", "B"),
+        ("In which novel does the character Jay Gatsby appear?", "The Catcher in the Rye", "The Great Gatsby", "Of Mice and Men", "Moby Dick", "B"),
+        ("Who wrote the play 'Romeo and Juliet'?", "Christopher Marlowe", "Ben Jonson", "William Shakespeare", "John Milton", "C"),
+        ("Who wrote 'Moby Dick'?", "Mark Twain", "Herman Melville", "Jules Verne", "Nathaniel Hawthorne", "B"),
+        ("Which author created the character Sherlock Holmes?", "Arthur Conan Doyle", "Agatha Christie", "Ian Fleming", "J.R.R. Tolkien", "A"),
+        ("In which book would you find the character Atticus Finch?", "Pride and Prejudice", "The Scarlet Letter", "To Kill a Mockingbird", "1984", "C"),
+        ("Who wrote 'The Odyssey'?", "Homer", "Virgil", "Sophocles", "Plato", "A"),
+        ("Which novel features the character Elizabeth Bennet?", "Great Expectations", "Jane Eyre", "Pride and Prejudice", "Wuthering Heights", "C")
+        # Add more Literature questions as needed
+    ],
+    "Geography": [
+        ("What is the capital of France?", "Berlin", "London", "Paris", "Rome", "C"),
+        ("What is the longest river in the world?", "Amazon", "Nile", "Yangtze", "Mississippi", "B"),
+        ("Which continent is the Sahara Desert located in?", "Asia", "South America", "Africa", "Australia", "C"),
+        ("What is the largest ocean on Earth?", "Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean", "D"),
+        ("What country has the largest population?", "United States", "India", "China", "Russia", "C"),
+        ("Which country is known as the Land of the Rising Sun?", "South Korea", "India", "Thailand", "Japan", "D"),
+        ("What is the smallest country in the world?", "Monaco", "Malta", "Vatican City", "San Marino", "C"),
+        ("Mount Everest is located in which mountain range?", "Andes", "Rockies", "Himalayas", "Alps", "C"),
+        ("What river flows through the Grand Canyon?", "Colorado River", "Missouri River", "Mississippi River", "Amazon River", "A"),
+        ("Which country has the most natural lakes?", "Canada", "United States", "Brazil", "Russia", "A")
+        # Add more Geography questions as needed
+    ],
+}
+
+# Insert sample data into each category table if empty
+for category, questions in sample_data.items():
+    cursor.execute(f"SELECT COUNT(*) FROM {category.lower()}_questions")
+    if cursor.fetchone()[0] == 0:
+        for question in questions:
+            cursor.execute(f'''
+            INSERT INTO {category.lower()}_questions (question_text, option_a, option_b, option_c, option_d, correct_answer)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ''', question)
+        conn.commit()
+
+# Define Question class
+class Question:
+    def __init__(self, question_text, options, correct_answer):
+        self.question_text = question_text
+        self.options = options
+        self.correct_answer = correct_answer
+
+    def check_answer(self, user_answer):
+        return user_answer == self.correct_answer
+
+# Main application class
+class QuizApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Quiz Bowl")
+        self.selected_category = tk.StringVar()
+        self.questions = []
+        self.current_question_index = 0
+        self.score = 0
+        self.user_answer = tk.StringVar()
+
+        # Load first window for category selection
+        self.create_category_selection_window()
+
+    def create_category_selection_window(self):
+        tk.Label(self.root, text="Select a Category").pack(pady=10)
+        category_menu = ttk.Combobox(self.root, textvariable=self.selected_category, values=list(category_tables.keys()))
+        category_menu.pack(pady=5)
+        tk.Button(self.root, text="Start Quiz Now", command=self.start_quiz).pack(pady=20)
+
+    def start_quiz(self):
+        category = self.selected_category.get()
+        if not category:
+            messagebox.showwarning("Select Category", "Please select a category to start the quiz.")
+            return
+
+        # Fetch questions for the selected category
+        self.fetch_questions(category)
+        if not self.questions:
+            messagebox.showerror("No Questions", "No questions available in this category.")
+            return
+
+        # Destroy category selection window and open quiz window
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.display_question()
+
+    def fetch_questions(self, category):
+        table_name = f"{category.lower()}_questions"
+        cursor.execute(f"SELECT question_text, option_a, option_b, option_c, option_d, correct_answer FROM {table_name}")
+        questions_data = cursor.fetchall()
+        self.questions = [
+            Question(question_text=row[0], options=row[1:5], correct_answer=row[5]) for row in questions_data
+        ]
+
+    def display_question(self):
+        if self.current_question_index >= len(self.questions):
+            self.show_score()
+            return
+
+        question = self.questions[self.current_question_index]
+        self.user_answer.set(None)
+
+        # Display question and options
+        tk.Label(self.root, text=question.question_text, font=("Arial", 14)).pack(pady=10)
+
+        for i, option_text in enumerate(question.options):
+            tk.Radiobutton(self.root, text=option_text, variable=self.user_answer, value=chr(65 + i)).pack(anchor='w')
+
+        tk.Button(self.root, text="Submit Answer", command=self.submit_answer).pack(pady=20)
+
+    def submit_answer(self):
+        question = self.questions[self.current_question_index]
+        user_answer = self.user_answer.get()
+
+        if not user_answer:
+            messagebox.showwarning("No Answer", "Please select an answer.")
+            return
+
+        # Check the answer
+        if question.check_answer(user_answer):
+            self.score += 1
+            messagebox.showinfo("Correct!", "Your answer is correct!")
+        else:
+            messagebox.showinfo("Incorrect", f"The correct answer was: {question.correct_answer}")
+
+        # Move to the next question
+        self.current_question_index += 1
+
+        # Clear window and show the next question
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.display_question()
+
+    def show_score(self):
+        messagebox.showinfo("Quiz Completed", f"Your score: {self.score} out of {len(self.questions)}")
+        self.root.quit()
+
+# Run the application
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = QuizApp(root)
+    root.mainloop()
