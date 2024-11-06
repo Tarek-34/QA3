@@ -6,9 +6,9 @@ import sqlite3
 conn = sqlite3.connect('quiz_bowl.db')
 cursor = conn.cursor()
 
-# Create separate tables for each category
+# Create separate tables for each new category
 category_tables = {
-    "Math": '''CREATE TABLE IF NOT EXISTS math_questions (
+    "Business Application Development": '''CREATE TABLE IF NOT EXISTS business_app_dev_questions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         question_text TEXT,
         option_a TEXT,
@@ -17,7 +17,7 @@ category_tables = {
         option_d TEXT,
         correct_answer TEXT
     )''',
-    "Science": '''CREATE TABLE IF NOT EXISTS science_questions (
+    "Management Information Systems": '''CREATE TABLE IF NOT EXISTS mis_questions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         question_text TEXT,
         option_a TEXT,
@@ -26,7 +26,7 @@ category_tables = {
         option_d TEXT,
         correct_answer TEXT
     )''',
-    "History": '''CREATE TABLE IF NOT EXISTS history_questions (
+    "Principles of Marketing": '''CREATE TABLE IF NOT EXISTS marketing_questions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         question_text TEXT,
         option_a TEXT,
@@ -35,7 +35,7 @@ category_tables = {
         option_d TEXT,
         correct_answer TEXT
     )''',
-    "Literature": '''CREATE TABLE IF NOT EXISTS literature_questions (
+    "Business Database Management": '''CREATE TABLE IF NOT EXISTS db_management_questions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         question_text TEXT,
         option_a TEXT,
@@ -44,7 +44,7 @@ category_tables = {
         option_d TEXT,
         correct_answer TEXT
     )''',
-    "Geography": '''CREATE TABLE IF NOT EXISTS geography_questions (
+    "Business Data Communications": '''CREATE TABLE IF NOT EXISTS data_communications_questions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         question_text TEXT,
         option_a TEXT,
@@ -62,73 +62,66 @@ conn.commit()
 
 # Define sample data for each category
 sample_data = {
-    "Math": [
-        ("What is 2 + 2?", "3", "4", "5", "6", "B"),
-        ("What is 5 + 7?", "10", "11", "12", "13", "C"),
-        ("What is 8 - 3?", "4", "5", "6", "7", "B"),
-        ("What is 9 * 3?", "27", "18", "36", "24", "A"),
-        ("What is 15 / 3?", "3", "4", "5", "6", "C"),
-        ("What is 6 + 9?", "13", "14", "15", "16", "C"),
-        ("What is 12 - 4?", "6", "7", "8", "9", "C"),
-        ("What is 7 * 4?", "28", "24", "30", "32", "A"),
-        ("What is 20 / 5?", "2", "4", "5", "6", "C"),
-        ("What is 18 + 6?", "22", "23", "24", "25", "C")
-        # Add more Math questions as needed
+    "Business Application Development": [
+        ("What is the main purpose of business application development?", "Data analysis", 
+         "Software creation for business processes", "Customer service", "Marketing", "B"),
+        ("Which language is commonly used for business web applications?", "JavaScript", "Python", 
+         "COBOL", "Fortran", "A"),
+        ("What is front-end development focused on?", "Database management", 
+         "User interface and experience", "Server maintenance", "Networking", "B"),
+        ("What is a common tool for back-end development?", "HTML", "CSS", "Node.js", "XML", "C"),
+        ("What does SDLC stand for?", "System Development Life Cycle", 
+         "Software Development Life Cycle", "System Design Logic Code", "Software Data Link Control", "B"),
     ],
-    "Science": [
-        ("What planet is known as the Red Planet?", "Earth", "Mars", "Venus", "Jupiter", "B"),
-        ("What gas do plants absorb from the atmosphere?", "Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen", "B"),
-        ("What is the chemical symbol for water?", "H2O", "O2", "CO2", "H2", "A"),
-        ("What force keeps us on the ground and prevents us from floating into space?", "Magnetism", "Gravity", "Inertia", "Friction", "B"),
-        ("What part of the plant conducts photosynthesis?", "Root", "Stem", "Leaf", "Flower", "C"),
-        ("What planet is closest to the Sun?", "Earth", "Venus", "Mars", "Mercury", "D"),
-        ("What is the largest organ in the human body?", "Brain", "Heart", "Skin", "Liver", "C"),
-        ("What gas do humans exhale?", "Oxygen", "Carbon Dioxide", "Nitrogen", "Helium", "B"),
-        ("What is the boiling point of water in Celsius?", "90", "100", "110", "120", "B"),
-        ("What is the powerhouse of the cell?", "Nucleus", "Mitochondria", "Ribosome", "Chloroplast", "B")
-        # Add more Science questions as needed
+    "Management Information Systems": [
+        ("What is MIS primarily concerned with?", "Manufacturing", 
+         "Information management and decision-making", "Programming", "Legal compliance", "B"),
+        ("Which component is a part of an information system?", "People", "Products", 
+         "Raw materials", "Vehicles", "A"),
+        ("What is ERP?", "Efficient Resource Planning", "Enterprise Resource Planning", 
+         "Extended Resource Platform", "Enhanced Research Program", "B"),
+        ("Which of these is a core MIS function?", "Building websites", "Managing data", 
+         "Customer feedback analysis", "Physical security", "B"),
+        ("What does CRM stand for in business?", "Customer Retention Methodology", 
+         "Customer Relationship Management", "Critical Response Model", "Customer Resource Manual", "B"),
     ],
-    "History": [
-        ("Who was the first President of the United States?", "Thomas Jefferson", "Abraham Lincoln", "George Washington", "Benjamin Franklin", "C"),
-        ("In which year did World War II end?", "1942", "1943", "1945", "1946", "C"),
-        ("Which ancient civilization built the pyramids?", "Romans", "Greeks", "Egyptians", "Persians", "C"),
-        ("Who wrote the Declaration of Independence?", "George Washington", "Thomas Jefferson", "John Adams", "Alexander Hamilton", "B"),
-        ("Who was known as the 'Father of the Constitution'?", "George Washington", "James Madison", "Benjamin Franklin", "Thomas Jefferson", "B"),
-        ("Which empire was led by Julius Caesar?", "Greek Empire", "Persian Empire", "Roman Empire", "Ottoman Empire", "C"),
-        ("What was the name of the ship that brought the Pilgrims to America?", "Santa Maria", "Mayflower", "Victoria", "Endeavour", "B"),
-        ("Who was the famous nurse during the Crimean War?", "Clara Barton", "Florence Nightingale", "Marie Curie", "Susan B. Anthony", "B"),
-        ("In which city was the Titanic built?", "New York", "Liverpool", "Belfast", "Southampton", "C"),
-        ("Which event started World War I?", "Sinking of Lusitania", "Assassination of Archduke Franz Ferdinand", "Treaty of Versailles", "Invasion of Poland", "B")
-        # Add more History questions as needed
+    "Principles of Marketing": [
+        ("What is the primary goal of marketing?", "Creating advertisements", 
+         "Meeting customer needs profitably", "Developing products", "Managing supply chains", "B"),
+        ("Which of these is one of the 4Ps of Marketing?", "Profit", "Price", 
+         "People", "Productivity", "B"),
+        ("What is market segmentation?", "Setting product prices", 
+         "Dividing a market into groups", "Creating promotional materials", "Analyzing customer feedback", "B"),
+        ("What is a target market?", "Any potential customer", "Specific group a company aims to reach", 
+         "International customers", "Local customers only", "B"),
+        ("What is the purpose of branding?", "Product design", "Differentiating a product", 
+         "Cost reduction", "Increasing sales tax", "B"),
     ],
-    "Literature": [
-        ("Who wrote 'To Kill a Mockingbird'?", "Harper Lee", "F. Scott Fitzgerald", "Ernest Hemingway", "Mark Twain", "A"),
-        ("Who wrote 'Pride and Prejudice'?", "Jane Austen", "Emily Bronte", "George Eliot", "Charles Dickens", "A"),
-        ("Who is the author of '1984'?", "Aldous Huxley", "George Orwell", "Ray Bradbury", "J.D. Salinger", "B"),
-        ("In which novel does the character Jay Gatsby appear?", "The Catcher in the Rye", "The Great Gatsby", "Of Mice and Men", "Moby Dick", "B"),
-        ("Who wrote the play 'Romeo and Juliet'?", "Christopher Marlowe", "Ben Jonson", "William Shakespeare", "John Milton", "C"),
-        ("Who wrote 'Moby Dick'?", "Mark Twain", "Herman Melville", "Jules Verne", "Nathaniel Hawthorne", "B"),
-        ("Which author created the character Sherlock Holmes?", "Arthur Conan Doyle", "Agatha Christie", "Ian Fleming", "J.R.R. Tolkien", "A"),
-        ("In which book would you find the character Atticus Finch?", "Pride and Prejudice", "The Scarlet Letter", "To Kill a Mockingbird", "1984", "C"),
-        ("Who wrote 'The Odyssey'?", "Homer", "Virgil", "Sophocles", "Plato", "A"),
-        ("Which novel features the character Elizabeth Bennet?", "Great Expectations", "Jane Eyre", "Pride and Prejudice", "Wuthering Heights", "C")
-        # Add more Literature questions as needed
+    "Business Database Management": [
+        ("What is a database?", "A software for designing websites", 
+         "A collection of organized data", "A programming language", "A network protocol", "B"),
+        ("What is SQL?", "Standard Query Language", 
+         "Structured Query Language", "Simple Query Layout", "Standard Queue Link", "B"),
+        ("What is a primary key in a database?", "A field that uniquely identifies a record", 
+         "A type of software", "An encryption method", "A programming function", "A"),
+        ("What is the purpose of a relational database?", "Organize data in tables", 
+         "Analyze network traffic", "Optimize web content", "Design application interfaces", "A"),
+        ("Which command is used to retrieve data in SQL?", "UPDATE", 
+         "DELETE", "SELECT", "INSERT", "C"),
     ],
-    "Geography": [
-        ("What is the capital of France?", "Berlin", "London", "Paris", "Rome", "C"),
-        ("What is the longest river in the world?", "Amazon", "Nile", "Yangtze", "Mississippi", "B"),
-        ("Which continent is the Sahara Desert located in?", "Asia", "South America", "Africa", "Australia", "C"),
-        ("What is the largest ocean on Earth?", "Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean", "D"),
-        ("What country has the largest population?", "United States", "India", "China", "Russia", "C"),
-        ("Which country is known as the Land of the Rising Sun?", "South Korea", "India", "Thailand", "Japan", "D"),
-        ("What is the smallest country in the world?", "Monaco", "Malta", "Vatican City", "San Marino", "C"),
-        ("Mount Everest is located in which mountain range?", "Andes", "Rockies", "Himalayas", "Alps", "C"),
-        ("What river flows through the Grand Canyon?", "Colorado River", "Missouri River", "Mississippi River", "Amazon River", "A"),
-        ("Which country has the most natural lakes?", "Canada", "United States", "Brazil", "Russia", "A")
-        # Add more Geography questions as needed
-    ],
+    "Business Data Communications": [
+        ("What is data communication?", "The process of printing data", 
+         "Exchange of data between devices", "A programming language", "A type of database", "B"),
+        ("What is bandwidth?", "The speed of a car", 
+         "Amount of data transmitted over a network", "Strength of an internet signal", "Number of computers in a network", "B"),
+        ("Which device is essential for networking?", "Keyboard", "Router", 
+         "Mouse", "Scanner", "B"),
+        ("What is Wi-Fi?", "A data management system", 
+         "Wireless communication technology", "An internet service provider", "A programming language", "B"),
+        ("What is the purpose of an IP address?", "To store user data", 
+         "To identify devices on a network", "To provide internet speed", "To analyze data", "B"),
+    ]
 }
-
 # Insert sample data into each category table if empty
 for category, questions in sample_data.items():
     cursor.execute(f"SELECT COUNT(*) FROM {category.lower()}_questions")
@@ -139,6 +132,7 @@ for category, questions in sample_data.items():
             VALUES (?, ?, ?, ?, ?, ?)
             ''', question)
         conn.commit()
+
 
 # Define Question class
 class Question:
@@ -188,7 +182,7 @@ class QuizApp:
         self.display_question()
 
     def fetch_questions(self, category):
-        table_name = f"{category.lower()}_questions"
+        table_name = f"{category.lower().replace(' ', '_')}_questions"
         cursor.execute(f"SELECT question_text, option_a, option_b, option_c, option_d, correct_answer FROM {table_name}")
         questions_data = cursor.fetchall()
         self.questions = [
